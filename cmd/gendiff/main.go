@@ -14,6 +14,13 @@ func main() {
 		Name:      "gendiff",
 		Usage:     "Compares two configuration files and shows a difference.",
 		UsageText: "gendiff [global options]",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "format",
+				Aliases: []string{"f"},
+				Usage:   "output format (default: \"stylish\")",
+			},
+		},
 	}
 
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
