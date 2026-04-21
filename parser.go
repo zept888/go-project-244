@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v3"
 )
 
 func ParseFile(path string) (map[string]any, error) {
@@ -18,13 +20,13 @@ func ParseFile(path string) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot read file %q: %w", absPath, err)
 	}
 
-	ext := filepath.Ext(absPath)
-
-	switch ext {
+	switch filepath.Ext(absPath) {
 	case ".json":
 		return parseJSON(data)
+	case ".yml", ".yaml":
+		return parseYAML(data)
 	default:
-		return nil, fmt.Errorf("unsupported file format: %q", ext)
+		return nil, fmt.Errorf("unsupported file format: %q", filepath.Ext(absPath))
 	}
 }
 
@@ -32,6 +34,14 @@ func parseJSON(data []byte) (map[string]any, error) {
 	var result map[string]any
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, fmt.Errorf("invalid JSON: %w", err)
+	}
+	return result, nil
+}
+
+func parseYAML(data []byte) (map[string]any, error) {
+	var result map[string]any
+	if err := yaml.Unmarshal(data, &result); err != nil {
+		return nil, fmt.Errorf("invalid YAML: %w", err)
 	}
 	return result, nil
 }
