@@ -33,3 +33,8 @@ func TestGenDiffYaml(t *testing.T) {
   + verbose: true
 }`, result)
 }
+
+func TestGenDiffUnsupportedFormat(t *testing.T) {
+	_, err := GenDiff("testdata/fixture/file1.txt", "testdata/fixture/file2.txt", "stylish")
+	assert.Error(t, err)
+}
