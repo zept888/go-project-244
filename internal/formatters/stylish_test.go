@@ -18,6 +18,9 @@ func TestFormatStylish(t *testing.T) {
 		{Key: "timeout", Type: diff.Updated, OldValue: 50, NewValue: 20},
 		{Key: "proxy", Type: diff.Removed, OldValue: "123.234.53.22"},
 		{Key: "verbose", Type: diff.Added, NewValue: true},
+		{Key: "nested", Type: diff.Nested, Children: []diff.Node{
+			{Key: "key", Type: diff.Unchanged, OldValue: "value"},
+		}},
 	}
 
 	result, err := Format(nodes, "stylish")
@@ -28,5 +31,8 @@ func TestFormatStylish(t *testing.T) {
   + timeout: 20
   - proxy: 123.234.53.22
   + verbose: true
+    nested: {
+        key: value
+    }
 }`, result)
 }

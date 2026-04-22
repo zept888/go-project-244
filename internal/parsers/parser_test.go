@@ -22,3 +22,8 @@ func TestParseFileYAML(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result)
 }
+
+func TestParseFileNotFound(t *testing.T) {
+	_, err := ParseFile("nonexistent.json")
+	assert.Error(t, err)
+}
