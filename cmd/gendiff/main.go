@@ -19,6 +19,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    "format",
 				Aliases: []string{"f"},
+				Value:   "stylish",
 				Usage:   "output format (default: \"stylish\")",
 			},
 		},

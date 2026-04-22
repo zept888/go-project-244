@@ -1,11 +1,73 @@
 package code
 
 import (
+	"code/internal/diff"
+	"code/internal/formatters"
 	"code/internal/parsers"
-	"fmt"
 	"sort"
-	"strings"
 )
+
+func buildDiff(data1, data2 map[string]any) []diff.Node {
+	// собираем все ключи
+	keysMap := make(map[string]struct{})
+	for k := range data1 {
+		keysMap[k] = struct{}{}
+	}
+	for k := range data2 {
+		keysMap[k] = struct{}{}
+	}
+
+	keys := make([]string, 0, len(keysMap))
+	for k := range keysMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var nodes []diff.Node
+	for _, k := range keys {
+		val1, inFile1 := data1[k]
+		val2, inFile2 := data2[k]
+
+		// оба значения — вложенные мапы, уходим в рекурсию
+		map1, isMap1 := val1.(map[string]any)
+		map2, isMap2 := val2.(map[string]any)
+
+		switch {
+		case inFile1 && inFile2 && isMap1 && isMap2:
+			nodes = append(nodes, diff.Node{
+				Key:      k,
+				Type:     diff.Nested,
+				Children: buildDiff(map1, map2),
+			})
+		case inFile1 && inFile2 && val1 == val2:
+			nodes = append(nodes, diff.Node{
+				Key:      k,
+				Type:     diff.Unchanged,
+				OldValue: val1,
+			})
+		case inFile1 && inFile2:
+			nodes = append(nodes, diff.Node{
+				Key:      k,
+				Type:     diff.Updated,
+				OldValue: val1,
+				NewValue: val2,
+			})
+		case inFile1:
+			nodes = append(nodes, diff.Node{
+				Key:      k,
+				Type:     diff.Removed,
+				OldValue: val1,
+			})
+		default:
+			nodes = append(nodes, diff.Node{
+				Key:      k,
+				Type:     diff.Added,
+				NewValue: val2,
+			})
+		}
+	}
+	return nodes
+}
 
 func GenDiff(filepath1, filepath2, format string) (string, error) {
 	data1, err := parsers.ParseFile(filepath1)
@@ -18,46 +80,7 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 		return "", err
 	}
 
-	_ = format
+	nodes := buildDiff(data1, data2)
 
-	// собираем все ключи из обоих файлов
-	keysMap := make(map[string]struct{})
-	for k := range data1 {
-		keysMap[k] = struct{}{}
-	}
-	for k := range data2 {
-		keysMap[k] = struct{}{}
-	}
-
-	// сортируем
-	keys := make([]string, 0, len(keysMap))
-	for k := range keysMap {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	// строим дифф
-	var lines []string
-	for _, k := range keys {
-		val1, inFile1 := data1[k]
-		val2, inFile2 := data2[k]
-
-		switch {
-		case inFile1 && inFile2 && val1 == val2:
-			// ключ есть в обоих, значения совпадают
-			lines = append(lines, fmt.Sprintf("    %s: %v", k, val1))
-		case inFile1 && inFile2:
-			// ключ есть в обоих, значения разные
-			lines = append(lines, fmt.Sprintf("  - %s: %v", k, val1))
-			lines = append(lines, fmt.Sprintf("  + %s: %v", k, val2))
-		case inFile1:
-			// ключ только в первом файле
-			lines = append(lines, fmt.Sprintf("  - %s: %v", k, val1))
-		default:
-			// ключ только во втором файле
-			lines = append(lines, fmt.Sprintf("  + %s: %v", k, val2))
-		}
-	}
-
-	return "{\n" + strings.Join(lines, "\n") + "\n}", nil
+	return formatters.Format(nodes, format)
 }

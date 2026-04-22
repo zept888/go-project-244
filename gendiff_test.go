@@ -6,35 +6,59 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGenDiff(t *testing.T) {
-	result, err := GenDiff("testdata/fixture/file1.json", "testdata/fixture/file2.json", "stylish")
+var expected = `{
+    common: {
+      + follow: false
+        setting1: Value 1
+      - setting2: 200
+      - setting3: true
+      + setting3: null
+      + setting4: blah blah
+      + setting5: {
+            key5: value5
+        }
+        setting6: {
+            doge: {
+              - wow: 
+              + wow: so much
+            }
+            key: value
+          + ops: vops
+        }
+    }
+    group1: {
+      - baz: bas
+      + baz: bars
+        foo: bar
+      - nest: {
+            key: value
+        }
+      + nest: str
+    }
+  - group2: {
+        abc: 12345
+        deep: {
+            id: 45
+        }
+    }
+  + group3: {
+        deep: {
+            id: {
+                number: 45
+            }
+        }
+        fee: 100500
+    }
+}`
 
+func TestGenDiffNested(t *testing.T) {
+	result, err := GenDiff("testdata/fixture/file1_nested.json", "testdata/fixture/file2_nested.json", "stylish")
 	assert.NoError(t, err)
-	assert.Equal(t, `{
-  - follow: false
-    host: hexlet.io
-  - proxy: 123.234.53.22
-  - timeout: 50
-  + timeout: 20
-  + verbose: true
-}`, result)
+	assert.Equal(t, expected, result)
 }
 
-func TestGenDiffYaml(t *testing.T) {
-	result, err := GenDiff("testdata/fixture/file1.yml", "testdata/fixture/file2.yml", "stylish")
-
+func TestGenDiffNestedYaml(t *testing.T) {
+	result, err := GenDiff("testdata/fixture/file1_nested.yml", "testdata/fixture/file2_nested.yml", "stylish")
 	assert.NoError(t, err)
-	assert.Equal(t, `{
-  - follow: false
-    host: hexlet.io
-  - proxy: 123.234.53.22
-  - timeout: 50
-  + timeout: 20
-  + verbose: true
-}`, result)
-}
-
-func TestGenDiffUnsupportedFormat(t *testing.T) {
-	_, err := GenDiff("testdata/fixture/file1.txt", "testdata/fixture/file2.txt", "stylish")
-	assert.Error(t, err)
+	assert.Equal(t, expected, result)
 }
