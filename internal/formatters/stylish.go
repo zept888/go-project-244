@@ -7,15 +7,6 @@ import (
 	"strings"
 )
 
-func Format(nodes []diff.Node, format string) (string, error) {
-	switch format {
-	case "stylish", "":
-		return stylish(nodes), nil
-	default:
-		return "", fmt.Errorf("unknown format: %q", format)
-	}
-}
-
 func stylish(nodes []diff.Node) string {
 	return renderNodes(nodes, 1)
 }
