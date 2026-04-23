@@ -1,6 +1,7 @@
 package code
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -79,4 +80,14 @@ Property 'group3' was added with value: [complex value]`
 	result, err := GenDiff("testdata/fixture/file1_nested.json", "testdata/fixture/file2_nested.json", "plain")
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
+}
+
+func TestGenDiffNestedJSON(t *testing.T) {
+	result, err := GenDiff("testdata/fixture/file1_nested.json", "testdata/fixture/file2_nested.json", "json")
+	assert.NoError(t, err)
+
+	// проверяем что вывод валидный json
+	var parsed []any
+	assert.NoError(t, json.Unmarshal([]byte(result), &parsed))
+	assert.NotEmpty(t, parsed)
 }

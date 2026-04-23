@@ -11,6 +11,8 @@ func Format(nodes []diff.Node, format string) (string, error) {
 		return stylish(nodes), nil
 	case "plain":
 		return plain(nodes), nil
+	case "json":
+		return formatJSON(nodes)
 	default:
 		return "", fmt.Errorf("unknown format: %q", format)
 	}
