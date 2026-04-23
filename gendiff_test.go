@@ -86,8 +86,7 @@ func TestGenDiffNestedJSON(t *testing.T) {
 	result, err := GenDiff("testdata/fixture/file1_nested.json", "testdata/fixture/file2_nested.json", "json")
 	assert.NoError(t, err)
 
-	// проверяем что вывод валидный json
-	var parsed []any
+	var parsed map[string]any
 	assert.NoError(t, json.Unmarshal([]byte(result), &parsed))
 	assert.NotEmpty(t, parsed)
 }

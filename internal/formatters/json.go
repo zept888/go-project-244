@@ -32,7 +32,10 @@ func toJSONNodes(nodes []diff.Node) []jsonNode {
 }
 
 func formatJSON(nodes []diff.Node) (string, error) {
-	data, err := json.MarshalIndent(toJSONNodes(nodes), "", "    ")
+	wrapped := map[string]any{
+		"diff": toJSONNodes(nodes),
+	}
+	data, err := json.MarshalIndent(wrapped, "", "    ")
 	if err != nil {
 		return "", fmt.Errorf("json marshal error: %w", err)
 	}
