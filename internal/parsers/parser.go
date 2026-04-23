@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// ParseFile reads a file and returns its contents as a map.
+// The format is determined by the file extension (.json, .yml, .yaml).
 func ParseFile(path string) (map[string]any, error) {
 	absPath, err := filepath.Abs(path)
 	if err != nil {

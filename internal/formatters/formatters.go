@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// Format formats the diff nodes according to the specified format.
+// Supported formats: stylish, plain, json. Defaults to stylish if empty.
 func Format(nodes []diff.Node, format string) (string, error) {
 	switch format {
 	case "stylish", "":

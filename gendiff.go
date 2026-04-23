@@ -69,6 +69,8 @@ func buildDiff(data1, data2 map[string]any) []diff.Node {
 	return nodes
 }
 
+// GenDiff compares two configuration files and returns the difference as a string.
+// The format parameter specifies the output format (stylish, plain, json).
 func GenDiff(filepath1, filepath2, format string) (string, error) {
 	data1, err := parsers.ParseFile(filepath1)
 	if err != nil {

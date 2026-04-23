@@ -38,3 +38,17 @@ func TestFormatStylish(t *testing.T) {
     }
 }`, result)
 }
+
+func TestFormatStylishWithMap(t *testing.T) {
+	nodes := []diff.Node{
+		{Key: "setting5", Type: diff.Added, NewValue: map[string]any{
+			"key5": "value5",
+		}},
+		{Key: "setting3", Type: diff.Updated, OldValue: true, NewValue: nil},
+	}
+
+	result, err := Format(nodes, "stylish")
+	assert.NoError(t, err)
+	assert.Contains(t, result, "key5: value5")
+	assert.Contains(t, result, "null")
+}
